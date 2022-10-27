@@ -1,0 +1,91 @@
+        -:    0:Source:write.c
+        -:    0:Graph:server-write.gcno
+        -:    0:Data:server-write.gcda
+        -:    0:Runs:1
+        -:    1:#include <sys/socket.h>
+        -:    2:#include <netinet/in.h>
+        -:    3:#include <arpa/inet.h>
+        -:    4:#include <stdio.h>
+        -:    5:#include <stdlib.h>
+        -:    6:#include <unistd.h>
+        -:    7:#include <string.h>
+        -:    8:#include <sys/types.h>
+        -:    9:#define MAX 100
+        -:   10:#define BUFFER_SIZE_1 256
+        -:   11:#define BUFFER_SIZE_4 1024
+        -:   12:
+        2:   13:void writefile()
+        -:   14:{
+        -:   15:	FILE *fw;
+        2:   16:	char filename[MAX] = "../src/";
+        -:   17:	char sl[BUFFER_SIZE_1];
+        -:   18:	char tl[BUFFER_SIZE_1];
+        -:   19:	
+        2:   20:	printf("\n\tplease enter your source language: ");
+        2:   21:	fgets(sl,BUFFER_SIZE_1,stdin);
+        2:   22:	sl[strlen(sl)-1]='\0';        //To remove \n from end of string
+        -:   23:	
+        2:   24:	printf("\n\tplease enter your target language: ");
+        2:   25:	fgets(tl,BUFFER_SIZE_1,stdin);
+        2:   26:	tl[strlen(tl)-1]='\0';
+        -:   27:
+        2:   28:	strcat(filename,sl);         
+        2:   29:	strcat(filename,"_");
+        2:   30:	strcat(filename,tl);
+        2:   31:	strcat(filename,".txt");
+        2:   32:	printf("\t");
+        2:   33:	printf("%s",filename);
+        -:   34:	
+        2:   35:	fw = fopen(filename, "a"); //opening file in append mode
+        -:   36:	
+        2:   37:	if (fw == NULL)
+    #####:   38:        	return;
+        -:   39:
+        2:   40:	int flag=1,ct=1;
+        -:   41:	char w[BUFFER_SIZE_1];
+        -:   42:	
+        6:   43:   	while(flag)
+        -:   44:   	{	
+        6:   45:		switch(ct)
+        -:   46:		{
+        2:   47:		case 1:	printf("\n\tEnter your source word\n");
+        2:   48:				printf("\t");
+        2:   49:				fgets(w,BUFFER_SIZE_1,stdin);
+        2:   50:				w[strlen(w)-1]='\0';	
+        2:   51:				fputs(w, fw); 
+        2:   52:				fputs(":", fw);
+        2:   53:				break;
+        -:   54:
+        2:   55:		case 2:	printf("\n\tEnter your meaning\n");
+        2:   56:				printf("\t");
+        2:   57:				fgets(w,BUFFER_SIZE_1,stdin);
+        2:   58:				w[strlen(w)-1]='\0';	
+        2:   59:				fputs(w, fw); 
+        2:   60:				break;
+        -:   61:		
+        2:   62:		case 3: fputs("\n",fw);
+        2:   63:				break;
+        -:   64:   	        }
+        6:   65:		ct++;
+        -:   66:		
+        6:   67:		if(ct==4)
+        -:   68:			{
+        -:   69:			int i;
+        2:   70:			printf("\n\t Press 0 to continue or Press 1 for exit");
+        2:   71:			fgets(w,BUFFER_SIZE_1,stdin);
+        2:   72:			w[strlen(w)-1]='\0';
+        2:   73:				if(strcmp(w,"1")==0)
+        -:   74:				{
+        2:   75:					flag=0;
+        2:   76:					break;
+        -:   77:				}
+        -:   78:				else
+        -:   79:				{
+    #####:   80:					ct=1;
+        -:   81:				}
+        -:   82:			}
+        -:   83:
+        -:   84:	}
+        2:   85:		fclose(fw);
+        2:   86:		return;
+        -:   87:}

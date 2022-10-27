@@ -1,0 +1,94 @@
+        -:    0:Source:client.c
+        -:    0:Graph:server-client.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    1:
+        -:    2:#include <sys/socket.h>
+        -:    3:#include <sys/types.h>
+        -:    4:#include <netinet/in.h>
+        -:    5:#include <stdio.h>
+        -:    6:#include <string.h>
+        -:    7:#include <stdlib.h>
+        -:    8:#include <unistd.h>
+        -:    9:#include <arpa/inet.h>
+    #####:   10:int main(int argc, char *argv[])
+        -:   11:{
+    #####:   12:	int fd = 0;
+        -:   13:	char buff[1024];
+        -:   14:	char nbuff[1024];
+        -:   15:	char mbuff[1024];
+        -:   16:	//Setup Buffer Array
+    #####:   17:	memset(buff, '0',sizeof(buff));	
+        -:   18:	
+        -:   19:	//Create Socket
+    #####:   20:	fd = socket(AF_INET, SOCK_STREAM, 0);
+    #####:   21:    	if(fd<0)
+        -:   22:	{
+    #####:   23:		perror("Client Error: Socket not created succesfully");
+    #####:   24:		return 0;
+        -:   25:	}
+        -:   26:	
+        -:   27:	//Structure to store details
+        -:   28:	struct sockaddr_in server; 
+    #####:   29:	memset(&server, '0', sizeof(server)); 
+        -:   30:
+        -:   31:	//Initialize	
+    #####:   32:	server.sin_family = AF_INET;
+    #####:   33:	server.sin_port =  htons(8080);
+        -:   34:
+    #####:   35:	int in = inet_pton(AF_INET, "127.0.0.1", &server.sin_addr);
+    #####:   36:	if(in<0)
+        -:   37:	{
+    #####:   38:		perror("Client Error: IP not initialized succesfully");
+    #####:   39:		return 0;
+        -:   40:	}
+        -:   41:
+        -:   42:	//Connect to given server	
+    #####:   43:	in = connect(fd, (struct sockaddr *)&server, sizeof(server));
+    #####:   44:	if(in<0)
+        -:   45:	{
+    #####:   46:		perror("Client Error: Connection Failed.");
+    #####:   47:		return 0;
+        -:   48:	}    	
+        -:   49:	while(1)
+        -:   50:	{
+        -:   51:		
+    #####:   52:		printf("\n\t Please enter word you want to translate : ");
+    #####:   53:    	bzero(buff,256);
+    #####:   54:    	fgets(buff,255,stdin);
+    #####:   55:		buff[strlen(buff)-1]='\0';
+        -:   56:		
+    #####:   57:		printf("\n\t Please enter your source language : ");
+    #####:   58:		fgets(nbuff,255,stdin);	
+    #####:   59:        nbuff[strlen(nbuff)-1]='\0';	
+        -:   60:		
+    #####:   61:		printf("\n\t Please enter your target language : ");
+    #####:   62:		fgets(mbuff,255,stdin);
+        -:   63:		
+    #####:   64:		strcat(buff,":");
+    #####:   65:		strcat(buff,nbuff);
+    #####:   66:		strcat(buff,":");
+    #####:   67:		strcat(buff,mbuff);
+    #####:   68:		printf("\n\t Sending Request to SERVER : %s\n",buff);
+        -:   69:	
+        -:   70:		/* Send message to the server */
+    #####:   71:    		in = send(fd,buff,strlen(buff),0);
+    #####:   72:		    if (in < 0) 
+        -:   73:		    {
+    #####:   74:			 perror("\n\tClient Error: Writing to Server");
+    #####:   75:		    	return 0;
+        -:   76:		    }
+        -:   77:		    
+        -:   78:		/* Now read server response */
+    #####:   79:		    bzero(buff,256);
+    #####:   80:		    in = recv(fd,buff,255,0);
+    #####:   81:		    if (in < 0) 
+        -:   82:		    {
+    #####:   83:			 perror("\n\t Client Error: Reading from Server");
+    #####:   84:			return 0;
+        -:   85:		    }
+    #####:   86:		    printf("\n\t Received FROM SERVER: %s\n",buff);
+        -:   87:	}
+        -:   88:	close(fd);
+        -:   89:	return 0;
+        -:   90:}

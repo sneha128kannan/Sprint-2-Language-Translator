@@ -1,0 +1,5 @@
+hello:ନମସ୍କାର
+welcome:ସ୍ୱାଗତ
+smart:ସ୍ମାର୍ଟ
+beautiful:ସୁନ୍ଦର
+kind:ପ୍ରକାର

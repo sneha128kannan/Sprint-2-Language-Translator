@@ -1,0 +1,5 @@
+hello:வணக்கம்
+welcome:வரவேற்பு
+smart:புத்திசாலி
+beautiful:அழகு
+kind:கருணை

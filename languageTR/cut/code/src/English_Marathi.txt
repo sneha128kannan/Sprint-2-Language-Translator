@@ -1,0 +1,5 @@
+hello:नमस्कार
+welcome:स्वागत
+beautiful:सुंदर
+smart:हुशार
+kind:दयाळू

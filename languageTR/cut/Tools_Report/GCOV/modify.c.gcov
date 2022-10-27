@@ -1,0 +1,119 @@
+        -:    0:Source:modify.c
+        -:    0:Graph:server-modify.gcno
+        -:    0:Data:server-modify.gcda
+        -:    0:Runs:1
+        -:    1:#include <sys/socket.h>
+        -:    2:#include <netinet/in.h>
+        -:    3:#include <arpa/inet.h>
+        -:    4:#include <stdio.h>
+        -:    5:#include <stdlib.h>
+        -:    6:#include <unistd.h>
+        -:    7:#include <string.h>
+        -:    8:#include <sys/types.h>
+        -:    9:#define MAX 100
+        -:   10:#define BUFFER_SIZE_1 256
+        -:   11:#define BUFFER_SIZE_4 1024
+        -:   12:
+        5:   13:void replaceAll(char *str, const char *oldWord, const char *newWord)
+        -:   14:{
+        -:   15:    char *pos, temp[BUFFER_SIZE_4];
+        5:   16:    int index = 0;
+        -:   17:    int owlen;
+        -:   18:
+        5:   19:    owlen = strlen(oldWord);
+        -:   20:
+        -:   21:    // Fix: If oldWord and newWord are same it goes to infinite loop
+        5:   22:    if (!strcmp(oldWord, newWord)) {
+    #####:   23:        return;
+        -:   24:    }
+        -:   25:
+        -:   26:
+        -:   27:    /*
+        -:   28:     * Repeat till all occurrences are replaced. 
+        -:   29:     */
+        6:   30:    while ((pos = strstr(str, oldWord)) != NULL) //str - hello:word   oldword: hello
+        -:   31:    {
+        -:   32:        // Backup current line
+        1:   33:        strcpy(temp, str); //temp - hello:word
+        -:   34:
+        -:   35:        // Index of current found word
+        1:   36:        index = pos - str; //Index - NUll
+        -:   37:		
+        -:   38:        // Terminate str after word found index
+        1:   39:        str[index] = '\0';   //str[0] = NULL
+        -:   40:
+        -:   41:        // Concatenate str with new word 
+        1:   42:        strcat(str, newWord);  //str - hi   
+        -:   43:         
+        -:   44:        // Concatenate str with remaining words after 
+        -:   45:        // oldword found index.
+        1:   46:        strcat(str, temp+index+owlen);  //str: hi temp+index+owlen: hi:word
+        -:   47:		
+        -:   48:    }
+        -:   49:}
+        -:   50:
+        -:   51:
+        2:   52:void modify()
+        -:   53:{
+        -:   54:    /* File pointer to hold reference of input file */
+        -:   55:    FILE * fPtr;
+        -:   56:    FILE * fTemp;
+        2:   57:    char path[MAX] = "../src/";
+        -:   58:    
+        -:   59:    char buffer[BUFFER_SIZE_4];
+        -:   60:    char oldWord[MAX], newWord[MAX];
+        -:   61:
+        -:   62:
+        2:   63:    printf("\n\tEnter path of source file: "); //english_hindi.txt
+        2:   64:    scanf("%s", path);
+        -:   65:
+        2:   66:    printf("\n\tEnter word to replace: "); //hello
+        2:   67:    scanf("%s", oldWord);
+        -:   68:
+        2:   69:    printf("\n\tEnter the New word: "); //hola
+        2:   70:    scanf("%s", newWord);
+        -:   71:
+        -:   72:
+        -:   73:    /*  Open all required files */
+        2:   74:    fPtr  = fopen(path, "r");
+        2:   75:    fTemp = fopen("replace.tmp", "w"); 
+        -:   76:
+        -:   77:    /* fopen() return NULL if unable to open file in given mode. */
+        2:   78:    if (fPtr == NULL || fTemp == NULL)
+        -:   79:    {
+        -:   80:        /* Unable to open file hence exit */
+        1:   81:        printf("\n\tUnable to open file.\n");
+        1:   82:        printf("\n\tPlease check whether file exists and you have read/write privilege.\n");
+        1:   83:        return;
+        -:   84:    }
+        -:   85:
+        -:   86:
+        -:   87:    /*
+        -:   88:     * Read line from source file and write to destination 
+        -:   89:     * file after replacing given word.
+        -:   90:     */
+        6:   91:    while ((fgets(buffer, BUFFER_SIZE_4, fPtr)) != NULL)
+        -:   92:    {
+        -:   93:        // Replace all occurrence of word from current line
+        5:   94:        replaceAll(buffer, oldWord, newWord);
+        -:   95:
+        -:   96:        // After replacing write it to temp file.
+        5:   97:        fputs(buffer, fTemp);
+        -:   98:    }
+        -:   99:
+        -:  100:
+        -:  101:    /* Close all files to release resource */
+        1:  102:    fclose(fPtr);
+        1:  103:    fclose(fTemp);
+        -:  104:
+        -:  105:
+        -:  106:    /* Delete original source file */
+        1:  107:    remove(path);
+        -:  108:
+        -:  109:    /* Rename temp file as original file */
+        1:  110:    rename("replace.tmp", path);
+        -:  111:
+        1:  112:    printf("\n\tSuccessfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
+        -:  113:
+        1:  114:    return;
+        -:  115:}

@@ -1,0 +1,6 @@
+hello:नमस्ते
+welcome:स्वागत हे
+smart:होशियार
+beautiful:सुंदर
+kind:मेहरबान
+

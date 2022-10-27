@@ -1,0 +1,110 @@
+        -:    0:Source:delete.c
+        -:    0:Graph:server-delete.gcno
+        -:    0:Data:server-delete.gcda
+        -:    0:Runs:1
+        -:    1:#include <sys/socket.h>
+        -:    2:#include <netinet/in.h>
+        -:    3:#include <arpa/inet.h>
+        -:    4:#include <stdio.h>
+        -:    5:#include <stdlib.h>
+        -:    6:#include <unistd.h>
+        -:    7:#include <string.h>
+        -:    8:#include <sys/types.h>
+        -:    9:#define MAX 100
+        -:   10:#define BUFFER_SIZE_1 256
+        -:   11:#define BUFFER_SIZE_4 1024
+        -:   12:
+    #####:   13:int find_lno(char *fname)
+        -:   14:{
+        -:   15:	FILE*fptr1;
+    #####:   16:	fptr1=fopen(fname,"r");
+    #####:   17:	int lno=0;
+    #####:   18:	if (fptr1 == NULL)
+    #####:   19:		return 0;
+        -:   20:	char w[BUFFER_SIZE_1];
+    #####:   21:	printf("\n\tEnter your word : ");
+    #####:   22:	fgets(w,BUFFER_SIZE_1,stdin);
+    #####:   23:	w[strlen(w)-1]='\0';
+        -:   24:
+        -:   25:	char str[BUFFER_SIZE_1];
+        -:   26:	while(1)
+    #####:   27:	{
+    #####:   28:	if(fgets(str,BUFFER_SIZE_1,fptr1)==NULL) // feof returns non zero value if it points to end of file
+    #####:   29:		return 0;	
+    #####:   30:	str[strlen(str)-1]='\0';
+        -:   31:
+    #####:   32:		char *token=strtok(str,":");
+    #####:   33:		if(strcmp(token,w)==0)
+        -:   34:		{
+    #####:   35:			return lno;
+        -:   36:		}
+    #####:   37:		lno++;	
+        -:   38:	}
+        -:   39:	
+        -:   40:}
+        2:   41:  int delete() 
+        -:   42:  {
+        2:   43:        int lno, ctr = 0;
+        -:   44:        char ch;
+        -:   45:        FILE *fptr1, *fptr2;
+        2:   46:		char fname[BUFFER_SIZE_1]="../src/";
+        2:   47:        char str[BUFFER_SIZE_1], temp[] = "temp.txt";
+        -:   48:		
+        2:   49:		printf("\n\n\tDelete a specific line :\n");
+        2:   50:		printf("\n\t-------------------------------\n"); 
+        2:   51:		printf("\n\tInput the file name : ");
+        2:   52:		fgets(fname,BUFFER_SIZE_1,stdin);
+        2:   53:		fname[strlen(fname)-1]='\0';	
+        -:   54:		
+        2:   55:        fptr1 = fopen(fname, "r");
+        2:   56:        if (!fptr1) 
+        -:   57:		{
+        2:   58:                printf("\n\tFile not found or unable to open the input file!!\n");
+        2:   59:                return 0;
+        -:   60:        }
+        -:   61:		
+    #####:   62:        fptr2 = fopen(temp, "w"); // open the temporary file in write mode 
+    #####:   63:        if (!fptr2) 
+        -:   64:		{
+    #####:   65:                printf("\n\tUnable to open a temporary file to write!!\n");
+    #####:   66:                fclose(fptr1);
+    #####:   67:                return 0;
+        -:   68:        }
+        -:   69:		
+        -:   70:        //printf(" Input the line you want to remove  ");
+    #####:   71:      	lno=find_lno(fname);
+    #####:   72:		lno++;
+    #####:   73:	    printf("\n\t%d",lno);	
+        -:   74:        // copy all contents to the temporary file except the specific line
+    #####:   75:        while (!feof(fptr1)) 
+        -:   76:        {
+    #####:   77:            strcpy(str,"\0");
+    #####:   78:            fgets(str, BUFFER_SIZE_1, fptr1);
+    #####:   79:            if (!feof(fptr1)) 
+        -:   80:            {
+    #####:   81:                ctr++;
+        -:   82:                /* skip the line at given line number */
+    #####:   83:                if (ctr != lno) 
+        -:   84:                {
+    #####:   85:                    fprintf(fptr2, "%s", str);
+        -:   86:                }
+        -:   87:            }
+        -:   88:        }
+    #####:   89:        fclose(fptr1);
+    #####:   90:        fclose(fptr2);
+    #####:   91:        remove(fname);  		// remove the original file 
+    #####:   92:        rename(temp, fname); 	// rename the temporary file to original name
+        -:   93:/*------ Read the file ----------------*/
+    #####:   94:   fptr1=fopen(fname,"r"); 
+    #####:   95:            ch=fgetc(fptr1); 
+    #####:   96:          printf("\n\tNow the content of the file %s is : \n",fname); 
+    #####:   97:          while(ch!=EOF) 
+        -:   98:            { 
+    #####:   99:                printf("%c",ch); 
+    #####:  100:                ch=fgetc(fptr1); 
+        -:  101:            }
+    #####:  102:        fclose(fptr1);
+        -:  103:/*------- End of reading ---------------*/
+    #####:  104:        return 0;
+        -:  105:
+        -:  106:  }

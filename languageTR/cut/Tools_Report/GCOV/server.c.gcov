@@ -1,0 +1,178 @@
+        -:    0:Source:server.c
+        -:    0:Graph:server-server.gcno
+        -:    0:Data:server-server.gcda
+        -:    0:Runs:1
+        -:    1:#include <sys/socket.h>
+        -:    2:#include <netinet/in.h>
+        -:    3:#include <arpa/inet.h>
+        -:    4:#include <stdio.h>
+        -:    5:#include <stdlib.h>
+        -:    6:#include <unistd.h>
+        -:    7:#include <string.h>
+        -:    8:#include <sys/types.h>
+        -:    9:#define MAX 100
+        -:   10:#define BUFFER_SIZE_1 256
+        -:   11:#define BUFFER_SIZE_4 1024
+        -:   12:#include "function.h"
+        -:   13:
+    #####:   14:char *find(char*word,char *sl,char *tl)
+        -:   15:{
+        -:   16:	char str[BUFFER_SIZE_4];
+    #####:   17:    char filename[MAX]="../src/";
+        -:   18:	
+    #####:   19:    strcpy(filename,sl);
+    #####:   20:	sl[strlen(sl)-1]='\0';
+    #####:   21:	strcat(filename,"_");
+    #####:   22:	tl[strlen(tl)-1]='\0';
+    #####:   23:	strcat(filename,tl);
+    #####:   24:    strcat(filename,".txt");
+    #####:   25:	FILE *fw = fopen(filename, "r");
+        -:   26:
+        -:   27:	while(1)
+    #####:   28:	{
+        -:   29:		char *fword,*meaning;
+        -:   30:	
+    #####:   31:		if(fgets(str,BUFFER_SIZE_4,fw)==NULL)
+        -:   32:		{
+    #####:   33:			break;
+        -:   34:		}
+        -:   35:		else							//to allocate fword and meaning line by line
+        -:   36:		{	
+    #####:   37:			str[strlen(str)-1]='\0';           
+    #####:   38:			fword=strtok(str,":");
+    #####:   39:			meaning=strtok(NULL,":");
+        -:   40:		}
+        -:   41:		
+    #####:   42:		if(strcmp(word,fword)==0)     //compare word and fword until found
+        -:   43:		{
+    #####:   44:			strcpy(word,meaning);
+    #####:   45:			return word;
+        -:   46:		}
+        -:   47:	}
+    #####:   48:	strcpy(word,"\n\t Source word not found !!");  //word is not present in file
+    #####:   49:	return word;
+        -:   50:}
+        -:   51:
+    #####:   52:char *strsave(char *str)
+        -:   53:{	
+    #####:   54:	char*word=strtok(str,":");
+    #####:   55:	char*sl=strtok(NULL,":");
+    #####:   56:	char*tl=strtok(NULL,":");	
+        -:   57:	
+    #####:   58:	find(word,sl,tl);
+    #####:   59:        return word;
+        -:   60:}
+        -:   61:
+        1:   62:int main()
+        -:   63:{	char ct[MAX];
+        1:   64:	printf("\n\t 1) Admin Login \n\t 2) Start Sever \n\t 3) EXIT");
+        1:   65:	printf("\n\t Enter your choice : ");
+        1:   66:	fgets(ct,MAX,stdin);
+        1:   67:	ct[strlen(ct)-1]='\0';
+        -:   68:	
+        1:   69:	if(strcmp(ct,"1")==0)
+        -:   70:	{
+        -:   71:		char LoginId[MAX];
+        -:   72:        char Password[MAX];  
+        -:   73:		
+        1:   74:		printf("\n\t ----- Login Successful -----");		
+        1:   75:        printf("\n\t Welcome to admin system");
+        -:   76:        
+        1:   77:		printf("\n\n\t Please Enter your LoginID : ");
+        1:   78:        fgets(LoginId,MAX,stdin);
+        1:   79:		LoginId[strlen(LoginId)-1]='\0';
+        -:   80:		
+        1:   81:        printf("\n\t Please Enter your Password : ");
+        1:   82:        fgets(Password,MAX,stdin);
+        1:   83:		Password[strlen(Password)-1]='\0';
+        -:   84:		
+        1:   85:        if((strcmp(LoginId,"Admin")==0)&&(strcmp(Password,"admin")==0))
+        -:   86:		{        
+        -:   87:			while(1)
+        6:   88:			{
+        7:   89:                printf("\n\t 1) Add new language and words \n\t 2) Append new word and meaning \n\t 3) Edit words \n\t 4) Delete words \n\t 5) EXIT");
+        -:   90:				char *choice;
+        7:   91:				printf("\n\t Enter your choice : ");
+        7:   92:				scanf("%s",choice);
+        7:   93:				int n=atoi(choice);
+        7:   94:				switch(n)
+        -:   95:				{
+        1:   96:					case 1:	writefile();
+        1:   97:							break;
+        1:   98:					case 2:	writefile();
+        1:   99:							break;
+        2:  100:					case 3: modify();
+        2:  101:							break;
+        2:  102:					case 4: delete();
+        2:  103:							break;	
+        1:  104:					case 5: return EXIT_SUCCESS;	
+        -:  105:				}
+        -:  106:			}
+        -:  107:		}
+        -:  108:		else
+    #####:  109:			printf("\n\t Invalid Credentials");
+        -:  110:		
+        -:  111:	}
+        -:  112:	
+        -:  113:
+    #####:  114:	int fd = 0;
+        -:  115:	char buff[BUFFER_SIZE_4];
+        -:  116:	char nbuff[BUFFER_SIZE_4];
+        -:  117:	
+        -:  118:	//Setup Buffer Array
+    #####:  119:	memset(buff, '0',sizeof(buff));	
+        -:  120:
+        -:  121:	//Create Socket
+    #####:  122:	fd = socket(AF_INET, SOCK_STREAM, 0);
+    #####:  123:	if(fd<0)
+        -:  124:	{
+    #####:  125:		perror("Client Error: Socket not created succesfully");
+    #####:  126:		return 0;
+        -:  127:	}
+        -:  128:
+        -:  129:	//Structure to store details
+        -:  130:	struct sockaddr_in server; 
+    #####:  131:	memset(&server, '0', sizeof(server)); 
+        -:  132:
+        -:  133:	//Initialize	
+    #####:  134:	server.sin_family = AF_INET;    
+    #####:  135:	server.sin_port = htons(8080); 
+    #####:  136:    server.sin_addr.s_addr = htonl(INADDR_ANY);
+        -:  137:   
+        -:  138:
+    #####:  139:	bind(fd, (struct sockaddr*)&server, sizeof(server)); //bound socket to an addr. with bind
+        -:  140:
+        -:  141:	int in;
+        -:  142:	
+    #####:  143:	listen(fd, 10);   //it accepts connection and allocates queue
+        -:  144:	
+    #####:  145:	while(in = accept(fd, (struct sockaddr*)NULL, NULL))  //accept connection req from client
+        -:  146:	{		
+        -:  147:		int childpid,n;
+    #####:  148:		if ( (childpid = fork ()) == 0 ) 
+        -:  149:		{		
+        -:  150:			//close listening socket
+    #####:  151:			close (fd);
+        -:  152:		
+        -:  153:			//Clear Zeroes
+    #####:  154:			bzero(buff,256);
+    #####:  155:			bzero(nbuff,256);
+        -:  156:							
+    #####:  157:			while ( (n = recv(in, buff, 256,0)) > 0)  
+        -:  158:			{
+        -:  159:				
+    #####:  160:				printf("Server Received: %s",buff);
+    #####:  161:				char *nbuff = strsave(buff);
+        -:  162:				
+    #####:  163:				send(in, nbuff, strlen(nbuff), 0);
+        -:  164:		
+    #####:  165:				bzero(buff,256);
+        -:  166:										
+        -:  167:			}
+    #####:  168:			close(in);
+    #####:  169:			exit(0);
+        -:  170:		}
+        -:  171:
+        -:  172:		
+        -:  173:	}
+        -:  174:}
